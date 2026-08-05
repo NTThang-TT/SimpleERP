@@ -1,0 +1,147 @@
+/* ===== NHÂN SỰ PAGE (HRM) — Light Theme + NG-ZORRO ===== */
+
+.page {
+  padding: 24px 32px;
+  max-width: 1200px; /* Tăng max-width để chứa nhiều cột hơn */
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease;
+}
+
+/* HEADER */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.page-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+.page-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* ALERTS */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+  font-size: 13px;
+  animation: fadeInUp 0.3s ease;
+}
+.alert-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+/* STATS & FILTERS */
+.stats-row {
+  display: flex; gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.stat-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  display: flex; flex-direction: column;
+  min-width: 160px;
+  box-shadow: var(--shadow-sm);
+}
+.filter-card {
+  flex-grow: 1; /* Bộ lọc chiếm phần diện tích còn lại */
+  align-items: flex-start;
+  justify-content: center;
+}
+.stat-num { font-size: 28px; font-weight: 800; color: var(--primary-600); line-height: 1; }
+.stat-green { color: var(--accent-emerald); }
+.stat-label { font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+
+/* TABLE CARD */
+.table-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.table-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-light);
+}
+.table-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin: 0; }
+
+/* Bỏ các class custom cũ (.data-table) vì đã dùng nz-table */
+
+/* User cell trong nz-table */
+.user-cell { display: flex; align-items: center; gap: 12px; }
+.avatar {
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: white;
+  flex-shrink: 0;
+}
+.user-name { font-weight: 600; color: var(--text-primary); font-size: 14px; }
+.text-muted { color: var(--text-muted); }
+.text-sm { font-size: 13px; }
+
+/* ===== NG-ZORRO OVERRIDES ===== */
+
+/* nz-spin: Điều chỉnh vùng loading */
+::ng-deep .ant-spin-nested-loading > div > .ant-spin {
+  max-height: none;
+}
+
+/* nz-tag: Điều chỉnh kích thước tag */
+nz-tag {
+  font-size: 12px !important;
+}
+
+/* nz-modal: Form bên trong modal */
+::ng-deep .ant-modal-body {
+  padding: 24px;
+}
+
+/* nz-form: Spacing giữa các form item */
+::ng-deep .ant-form-item {
+  margin-bottom: 16px;
+}
+
+/* nz-select & nz-date-picker: Chiều rộng đầy đủ */
+::ng-deep nz-select,
+::ng-deep nz-date-picker {
+  width: 100%;
+}
+
+/* Override nz-table header padding */
+::ng-deep .ant-table-thead > tr > th {
+  background: var(--bg-input);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 12px 16px;
+}
+
+::ng-deep .ant-table-tbody > tr > td {
+  padding: 12px 16px;
+  vertical-align: middle;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .page { padding: 16px; }
+  .page-header { flex-direction: column; }
+  .page-title { font-size: 20px; }
+  .stats-row { flex-direction: column; }
+  .stat-card { min-width: unset; width: 100%; }
+}
