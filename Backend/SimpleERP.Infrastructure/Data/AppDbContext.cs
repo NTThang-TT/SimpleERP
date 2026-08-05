@@ -5,7 +5,7 @@ namespace SimpleERP.Infrastructure.Data;
 
 /// <summary>
 /// AppDbContext — Kết nối Entity Framework Core với SQL Server
-/// 3 DbSet tương ứng 3 bảng: Departments, Positions, Employees
+/// 4 DbSet tương ứng 4 bảng: Departments, Positions, Employees, Assets
 /// </summary>
 public class AppDbContext : DbContext
 {
@@ -13,6 +13,8 @@ public class AppDbContext : DbContext
     public DbSet<Department> Departments { get; set; } = null!;
     public DbSet<Position> Positions { get; set; } = null!;
     public DbSet<Employee> Employees { get; set; } = null!;
+    public DbSet<Asset> Assets { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -41,5 +43,12 @@ public class AppDbContext : DbContext
             .HasForeignKey(e => e.PositionId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Cấu hình quan hệ Asset → Department
+        modelBuilder.Entity<Asset>()
+            .HasOne(a => a.Department)
+            .WithMany(d => d.Assets)
+            .HasForeignKey(a => a.DepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
+

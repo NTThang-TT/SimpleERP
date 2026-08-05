@@ -140,7 +140,7 @@ export class LoginComponent {
     this.authService.login(usernameVal, passwordVal).subscribe({
       next: () => {
         this.isLoggingIn = false;
-        this.router.navigate(['/hr-dashboard']);
+        this.router.navigate(['/admin/dashboard']);
       },
       error: (err) => {
         this.isLoggingIn = false;

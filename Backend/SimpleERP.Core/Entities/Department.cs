@@ -25,4 +25,7 @@ public class Department
 
     // Navigation Property: 1 Phòng ban có nhiều Nhân viên
     public ICollection<Employee> Employees { get; set; } = new List<Employee>();
+
+    // Navigation Property: 1 Phòng ban có nhiều Vật tư
+    public ICollection<Asset> Assets { get; set; } = new List<Asset>();
 }

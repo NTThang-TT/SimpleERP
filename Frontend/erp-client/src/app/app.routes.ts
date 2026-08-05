@@ -1,7 +1,5 @@
 import { Routes } from '@angular/router';
-import { NhanSuComponent } from './nhan-su/nhan-su';
 import { authGuard } from './guards/auth.guard';
-
 import { AdminLayoutComponent } from './layout/admin-layout.component';
 
 export const routes: Routes = [
@@ -18,9 +16,21 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () => import('./hr-dashboard/hr-dashboard.component').then(m => m.HrDashboardComponent)
       },
-      { path: 'nhan-su', component: NhanSuComponent },
+      {
+        path: 'nhan-vien',
+        loadComponent: () => import('./pages/employee/employee-list.component').then(m => m.EmployeeListComponent)
+      },
+      {
+        path: 'phong-ban',
+        loadComponent: () => import('./pages/department/department-list.component').then(m => m.DepartmentListComponent)
+      },
+      {
+        path: 'vat-tu',
+        loadComponent: () => import('./pages/asset/asset-list.component').then(m => m.AssetListComponent)
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
-  { path: '', redirectTo: '/admin/dashboard', pathMatch: 'full' }
+  { path: '', redirectTo: '/admin/dashboard', pathMatch: 'full' },
+  { path: '**', redirectTo: '/admin/dashboard' }
 ];

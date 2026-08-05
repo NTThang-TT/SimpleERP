@@ -108,8 +108,23 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ==========================================
-// CHẠY SERVER
+// TỰ ĐỘNG TẠO DB & SEED DATA
 // ==========================================
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
+    {
+        dbContext.Database.EnsureCreated();
+        await DatabaseSeeder.SeedAsync(dbContext);
+        Console.WriteLine("  ✅ Database đã sẵn sàng (Seeded)");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"  ⚠️ DB Seed warning: {ex.Message}");
+    }
+}
+
 Console.WriteLine("==================================================");
 Console.WriteLine("  🚀 SimpleERP API Server đang chạy!");
 Console.WriteLine("  📍 URL:   http://localhost:5000");
