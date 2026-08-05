@@ -115,7 +115,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        dbContext.Database.EnsureCreated();
+        await dbContext.Database.MigrateAsync();
         await DatabaseSeeder.SeedAsync(dbContext);
         Console.WriteLine("  ✅ Database đã sẵn sàng (Seeded)");
     }

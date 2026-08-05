@@ -36,6 +36,34 @@ export interface Employee {
 export interface Department {
   departmentId: string;
   departmentName: string;
+  location?: string;
+}
+
+export interface Asset {
+  assetId: string;
+  assetName: string;
+  category: string;
+  quantity: number;
+  unit: string;
+  unitPrice: number;
+  departmentId: string;
+  departmentName: string;
+  status: string;
+  purchaseDate: string;
+  description?: string;
+}
+
+export interface AssetInput {
+  assetId: string;
+  assetName: string;
+  category: string;
+  quantity: number;
+  unit: string;
+  unitPrice: number;
+  departmentId: string;
+  status: string;
+  purchaseDate: string;
+  description?: string;
 }
 
 export interface Position {
