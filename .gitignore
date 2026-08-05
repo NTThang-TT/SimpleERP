@@ -1,0 +1,27 @@
+# ===== Backend (.NET) =====
+**/bin/
+**/obj/
+*.user
+*.suo
+.vs/
+
+# ===== Frontend (Angular) =====
+**/node_modules/
+**/dist/
+**/.angular/
+*.log
+npm-debug.log*
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.swp
+*.sln.docstates
+
+# ===== OS =====
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# ===== Secrets =====
+appsettings.Development.json

@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="SimpleERP.API/SimpleERP.API.csproj" />
+  <Project Path="SimpleERP.Core/SimpleERP.Core.csproj" />
+  <Project Path="SimpleERP.Infrastructure/SimpleERP.Infrastructure.csproj" />
+  <Project Path="SimpleERP.Shared/SimpleERP.Shared.csproj" />
+</Solution>
