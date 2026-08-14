@@ -188,6 +188,7 @@ export class DepartmentListComponent implements OnInit {
           this.isSaving.set(false);
           this.closeModal();
           this.loadData();
+          alert('Cập nhật phòng ban thành công!');
         },
         error: (err) => {
           this.isSaving.set(false);
@@ -200,6 +201,7 @@ export class DepartmentListComponent implements OnInit {
           this.isSaving.set(false);
           this.closeModal();
           this.loadData();
+          alert('Thêm phòng ban thành công!');
         },
         error: (err) => {
           this.isSaving.set(false);
@@ -212,7 +214,10 @@ export class DepartmentListComponent implements OnInit {
   deleteDept(id: string) {
     if (confirm(`Bạn có chắc muốn xóa phòng ban ${id}?`)) {
       this.deptService.delete(id).subscribe({
-        next: () => this.loadData(),
+        next: () => {
+          this.loadData();
+          alert('Xóa phòng ban thành công!');
+        },
         error: (err) => alert(err.error?.message || 'Lỗi khi xóa')
       });
     }
