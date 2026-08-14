@@ -154,6 +154,84 @@ public static class DatabaseSeeder
         };
         context.Assets.AddRange(assets);
 
+        // ===== 5. CHẤM CÔNG (Tuần 13) =====
+        var attendances = new List<Attendance>();
+        var employeeIds = new[] { "NV_01_L","NV_02_H","NV_03_T","NV_04_M","NV_05_D","NV_06_K","NV_07_A","NV_08_V","NV_09_P","NV_10_S",
+                                   "NV_11_B","NV_12_T","NV_13_N","NV_14_H","NV_15_Q","NV_16_L","NV_17_T","NV_18_H","NV_19_D","NV_20_P" };
+        var statuses = new[] { "Đúng giờ", "Đúng giờ", "Đúng giờ", "Đúng giờ", "Đi trễ", "Vắng mặt", "Đúng giờ", "Đi trễ", "Nghỉ phép", "Đúng giờ" };
+        var random = new Random(42);
+
+        for (int dayOffset = 0; dayOffset < 20; dayOffset++)
+        {
+            var date = DateTime.Today.AddDays(-dayOffset);
+            if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) continue;
+
+            foreach (var empId in employeeIds)
+            {
+                var statusIdx = random.Next(statuses.Length);
+                var st = statuses[statusIdx];
+                DateTime? checkIn = null, checkOut = null;
+                string? note = null;
+
+                if (st == "Đúng giờ")
+                {
+                    checkIn = date.AddHours(7).AddMinutes(45 + random.Next(15));
+                    checkOut = date.AddHours(17).AddMinutes(random.Next(30));
+                }
+                else if (st == "Đi trễ")
+                {
+                    checkIn = date.AddHours(8).AddMinutes(30 + random.Next(60));
+                    checkOut = date.AddHours(17).AddMinutes(15 + random.Next(30));
+                    note = "Kẹt xe / Lý do cá nhân";
+                }
+                else if (st == "Vắng mặt")
+                {
+                    note = "Không phép";
+                }
+                else if (st == "Nghỉ phép")
+                {
+                    note = "Đã có đơn xin nghỉ";
+                }
+
+                attendances.Add(new Attendance
+                {
+                    EmployeeId = empId,
+                    Date = date,
+                    CheckIn = checkIn,
+                    CheckOut = checkOut,
+                    Status = st,
+                    Note = note
+                });
+            }
+        }
+        context.Attendances.AddRange(attendances);
+
+        // ===== 6. ĐƠN XIN NGHỈ PHÉP (Tuần 13) =====
+        var leaveRequests = new List<LeaveRequest>
+        {
+            new() { EmployeeId="NV_04_M", LeaveType="Nghỉ phép năm",     StartDate=DateTime.Today.AddDays(-15), EndDate=DateTime.Today.AddDays(-14), Reason="Đi du lịch gia đình",                  Status="Đã duyệt",  ApprovedBy="NV_01_L", CreatedAt=DateTime.Today.AddDays(-20) },
+            new() { EmployeeId="NV_05_D", LeaveType="Nghỉ ốm",           StartDate=DateTime.Today.AddDays(-10), EndDate=DateTime.Today.AddDays(-8),  Reason="Bị cảm sốt, có giấy bệnh viện",       Status="Đã duyệt",  ApprovedBy="NV_01_L", CreatedAt=DateTime.Today.AddDays(-12) },
+            new() { EmployeeId="NV_06_K", LeaveType="Nghỉ không lương",   StartDate=DateTime.Today.AddDays(-7),  EndDate=DateTime.Today.AddDays(-5),  Reason="Về quê giải quyết việc gia đình",      Status="Đã duyệt",  ApprovedBy="NV_02_H", CreatedAt=DateTime.Today.AddDays(-10) },
+            new() { EmployeeId="NV_07_A", LeaveType="Nghỉ phép năm",     StartDate=DateTime.Today.AddDays(-3),  EndDate=DateTime.Today.AddDays(-2),  Reason="Nghỉ ngơi cá nhân",                    Status="Đã duyệt",  ApprovedBy="NV_01_L", CreatedAt=DateTime.Today.AddDays(-5) },
+            new() { EmployeeId="NV_08_V", LeaveType="Nghỉ việc riêng",   StartDate=DateTime.Today.AddDays(-1),  EndDate=DateTime.Today.AddDays(-1),  Reason="Đưa con đi khám bệnh",                Status="Đã duyệt",  ApprovedBy="NV_02_H", CreatedAt=DateTime.Today.AddDays(-3) },
+            new() { EmployeeId="NV_09_P", LeaveType="Nghỉ phép năm",     StartDate=DateTime.Today.AddDays(2),   EndDate=DateTime.Today.AddDays(4),   Reason="Đi công tác kết hợp nghỉ phép",        Status="Chờ duyệt",  CreatedAt=DateTime.Today.AddDays(-1) },
+            new() { EmployeeId="NV_10_S", LeaveType="Nghỉ ốm",           StartDate=DateTime.Today.AddDays(1),   EndDate=DateTime.Today.AddDays(2),   Reason="Đau răng, cần đi nhổ",                 Status="Chờ duyệt",  CreatedAt=DateTime.Today },
+            new() { EmployeeId="NV_11_B", LeaveType="Nghỉ không lương",   StartDate=DateTime.Today.AddDays(5),   EndDate=DateTime.Today.AddDays(7),   Reason="Tham dự đám cưới anh/chị ở Đà Nẵng",   Status="Chờ duyệt",  CreatedAt=DateTime.Today },
+            new() { EmployeeId="NV_12_T", LeaveType="Nghỉ phép năm",     StartDate=DateTime.Today.AddDays(3),   EndDate=DateTime.Today.AddDays(3),   Reason="Đi hiến máu nhân đạo",                 Status="Chờ duyệt",  CreatedAt=DateTime.Today.AddDays(-1) },
+            new() { EmployeeId="NV_13_N", LeaveType="Nghỉ việc riêng",   StartDate=DateTime.Today.AddDays(-5),  EndDate=DateTime.Today.AddDays(-5),  Reason="Gia đình có tang",                     Status="Đã duyệt",  ApprovedBy="NV_01_L", CreatedAt=DateTime.Today.AddDays(-7) },
+            new() { EmployeeId="NV_14_H", LeaveType="Nghỉ phép năm",     StartDate=DateTime.Today.AddDays(-20), EndDate=DateTime.Today.AddDays(-18), Reason="Đi phỏng vấn khóa học MBA",            Status="Từ chối",    ApprovedBy="NV_01_L", CreatedAt=DateTime.Today.AddDays(-25) },
+            new() { EmployeeId="NV_15_Q", LeaveType="Nghỉ ốm",           StartDate=DateTime.Today.AddDays(-12), EndDate=DateTime.Today.AddDays(-11), Reason="Ngộ độc thực phẩm",                    Status="Đã duyệt",  ApprovedBy="NV_02_H", CreatedAt=DateTime.Today.AddDays(-14) },
+            new() { EmployeeId="NV_16_L", LeaveType="Nghỉ không lương",   StartDate=DateTime.Today.AddDays(10),  EndDate=DateTime.Today.AddDays(14),  Reason="Đi du lịch nước ngoài",                Status="Chờ duyệt",  CreatedAt=DateTime.Today.AddDays(-2) },
+            new() { EmployeeId="NV_17_T", LeaveType="Nghỉ phép năm",     StartDate=DateTime.Today.AddDays(-8),  EndDate=DateTime.Today.AddDays(-6),  Reason="Về quê ăn giỗ",                        Status="Đã duyệt",  ApprovedBy="NV_01_L", CreatedAt=DateTime.Today.AddDays(-12) },
+            new() { EmployeeId="NV_18_H", LeaveType="Nghỉ ốm",           StartDate=DateTime.Today.AddDays(-2),  EndDate=DateTime.Today.AddDays(-1),  Reason="Bị COVID, tự cách ly tại nhà",         Status="Đã duyệt",  ApprovedBy="NV_02_H", CreatedAt=DateTime.Today.AddDays(-4) },
+            new() { EmployeeId="NV_19_D", LeaveType="Nghỉ việc riêng",   StartDate=DateTime.Today.AddDays(6),   EndDate=DateTime.Today.AddDays(6),   Reason="Dọn nhà mới",                          Status="Chờ duyệt",  CreatedAt=DateTime.Today },
+            new() { EmployeeId="NV_20_P", LeaveType="Nghỉ phép năm",     StartDate=DateTime.Today.AddDays(-25), EndDate=DateTime.Today.AddDays(-22), Reason="Nghỉ Tết dương lịch",                  Status="Đã duyệt",  ApprovedBy="NV_01_L", CreatedAt=DateTime.Today.AddDays(-30) },
+            new() { EmployeeId="NV_04_M", LeaveType="Nghỉ không lương",   StartDate=DateTime.Today.AddDays(8),   EndDate=DateTime.Today.AddDays(9),   Reason="Đi thi chứng chỉ AWS",                Status="Chờ duyệt",  CreatedAt=DateTime.Today.AddDays(-1) },
+            new() { EmployeeId="NV_06_K", LeaveType="Nghỉ ốm",           StartDate=DateTime.Today.AddDays(-18), EndDate=DateTime.Today.AddDays(-17), Reason="Viêm họng cấp",                        Status="Từ chối",    ApprovedBy="NV_02_H", CreatedAt=DateTime.Today.AddDays(-20) },
+            new() { EmployeeId="NV_11_B", LeaveType="Nghỉ phép năm",     StartDate=DateTime.Today.AddDays(-30), EndDate=DateTime.Today.AddDays(-28), Reason="Đi du lịch Phú Quốc",                  Status="Đã duyệt",  ApprovedBy="NV_01_L", CreatedAt=DateTime.Today.AddDays(-35) },
+        };
+        context.LeaveRequests.AddRange(leaveRequests);
+
         await context.SaveChangesAsync();
     }
 }

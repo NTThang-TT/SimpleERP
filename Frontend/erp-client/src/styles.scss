@@ -97,3 +97,5 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+body.dark { filter: invert(1) hue-rotate(180deg); background-color: #f1f5f9; } body.dark img, body.dark svg { filter: invert(1) hue-rotate(180deg); }

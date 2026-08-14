@@ -22,150 +22,145 @@ import { PositionService } from '../services/position.service';
 import { EmployeeDTO, Department, Position } from '../models/employee-dto.model';
 import { EmployeeStateService } from '../store/employee.state';
 import { AuthService } from '../services/auth.service';
+import { AttendanceService, AttendanceDTO } from '../services/attendance.service';
 
 @Component({
   selector: 'app-hr-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, SearchBarComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   template: `
-    <div class="min-h-screen bg-slate-50/50 relative">
-      
-      <!-- Top Navigation/Header -->
-      <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-        <div class="px-6 sm:px-8 max-w-7xl mx-auto h-16 flex items-center justify-between">
-          <div class="flex items-center gap-6">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-                <span class="text-xl">📊</span>
-              </div>
-              <div>
-                <h1 class="text-lg font-bold text-slate-800 leading-tight">HR Dashboard</h1>
-                <p class="text-xs text-slate-500 font-medium">Quản lý Nhân sự</p>
-              </div>
+    <div class="p-6 lg:p-8">
+      <!-- Self Check-in Widget -->
+      <div class="mb-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+          <h3 class="text-xl font-bold mb-1">Chấm công hôm nay</h3>
+          <p class="text-indigo-100 text-sm">Hôm nay là: {{ todayDate | date:'fullDate':'':'vi-VN' }}</p>
+        </div>
+        <div class="flex items-center gap-4 bg-white/10 p-3 rounded-xl backdrop-blur-sm">
+          @if (attendanceLoading()) {
+            <span class="text-indigo-100">Đang kiểm tra...</span>
+          } @else if (!myTodayAttendance()) {
+            <div class="text-right mr-2">
+              <div class="text-sm text-indigo-100 mb-0.5">Bạn chưa chấm công</div>
             </div>
-
-            <!-- Navigation Links -->
-            <nav class="hidden md:flex items-center gap-2 border-l border-slate-200 pl-6">
-              <a routerLink="/hr-dashboard" class="px-3 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-lg transition-colors">👥 Nhân sự</a>
-            </nav>
-          </div>
-          
-          <div class="flex items-center gap-4">
-            <div class="hidden lg:flex items-center gap-2 text-sm text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Live Data: SQL Server
-            </div>
-            <button
-              (click)="onLogout()"
-              class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-rose-50 text-slate-500 hover:text-rose-600 text-sm font-medium transition-colors"
-            >
-              🚪 Đăng xuất
+            <button (click)="doCheckIn()" [disabled]="actionLoading()"
+              class="bg-white text-indigo-600 hover:bg-indigo-50 px-6 py-2.5 rounded-lg font-bold shadow-md transition-all disabled:opacity-50 flex items-center gap-2">
+              <span>🎯</span> Check In
             </button>
-          </div>
+          } @else if (myTodayAttendance() && !myTodayAttendance()!.checkOut) {
+            <div class="text-right mr-2">
+              <div class="text-sm text-indigo-100 mb-0.5">Đã Check-in lúc:</div>
+              <div class="font-bold">{{ myTodayAttendance()!.checkIn | date:'HH:mm' }}</div>
+            </div>
+            <button (click)="doCheckOut()" [disabled]="actionLoading()"
+              class="bg-rose-500 hover:bg-rose-600 text-white px-6 py-2.5 rounded-lg font-bold shadow-md transition-all disabled:opacity-50 flex items-center gap-2">
+              <span>🏃</span> Check Out
+            </button>
+          } @else {
+            <div class="text-right mr-2">
+              <div class="text-sm text-indigo-100 mb-0.5">Giờ làm việc:</div>
+              <div class="font-bold">{{ myTodayAttendance()!.checkIn | date:'HH:mm' }} - {{ myTodayAttendance()!.checkOut | date:'HH:mm' }}</div>
+            </div>
+            <div class="bg-emerald-500/20 text-emerald-100 px-4 py-2.5 rounded-lg font-bold border border-emerald-500/30 flex items-center gap-2">
+              <span>✅</span> Hoàn thành
+            </div>
+          }
         </div>
-      </header>
+      </div>
 
-      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- Welcome Section -->
-        <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Tổng quan Nhân sự</h2>
-            <p class="text-slate-500 mt-1">Theo dõi tình hình biến động nhân sự trực tiếp từ hệ thống.</p>
-          </div>
-          <div class="flex items-center gap-4">
-            @if (isAdminOrHR()) {
-              <a routerLink="/admin/employee" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5">
-                Quản lý Nhân sự ➔
-              </a>
-            }
-          </div>
+      <!-- Welcome Section -->
+      <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Tổng quan Nhân sự</h2>
+          <p class="text-slate-500 mt-1">Theo dõi tình hình biến động nhân sự trực tiếp từ hệ thống.</p>
         </div>
+        <div class="flex items-center gap-4">
+          @if (isAdminOrHR()) {
+            <a routerLink="/admin/nhan-vien" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5">
+              Quản lý Nhân sự ➤
+            </a>
+          }
+        </div>
+      </div>
 
-        <!-- KPI Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          
-          <!-- Card 1 -->
-          <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-            <div class="flex justify-between items-start">
-              <div>
-                <p class="text-sm font-medium text-slate-500 mb-1">Tổng nhân viên</p>
-                <h3 class="text-3xl font-bold text-slate-800">{{ totalCount() }}</h3>
-              </div>
-              <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl">👥</div>
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
+          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium text-slate-500 mb-1">Tổng nhân viên</p>
+              <h3 class="text-3xl font-bold text-slate-800">{{ totalCount() }}</h3>
             </div>
-            <div class="mt-4 flex items-center gap-1.5 text-xs text-emerald-600 font-medium bg-emerald-50 inline-block px-2 py-1 rounded-md">
-              <span>↗</span> <span>Cập nhật mới</span>
-            </div>
+            <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl">👥</div>
           </div>
-
-          <!-- Card 2 -->
-          <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-            <div class="flex justify-between items-start">
-              <div>
-                <p class="text-sm font-medium text-slate-500 mb-1">Đang hoạt động</p>
-                <h3 class="text-3xl font-bold text-slate-800">{{ activeCount() }}</h3>
-              </div>
-              <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">✅</div>
-      
-              </div>
-            <div class="mt-4 flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-              Tình trạng làm việc bình thường
-            </div>
-          </div>
-
-          <!-- Card 3 -->
-          <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-            <div class="flex justify-between items-start">
-              <div>
-                <p class="text-sm font-medium text-slate-500 mb-1">Nghỉ phép</p>
-                <h3 class="text-3xl font-bold text-slate-800">{{ onLeaveCount() }}</h3>
-              </div>
-              <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">⛱️</div>
-            </div>
-            <div class="mt-4 flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-              Tạm thời vắng mặt
-            </div>
-          </div>
-
-          <!-- Card 4 -->
-          <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-rose-500/10 to-red-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-            <div class="flex justify-between items-start">
-              <div>
-                <p class="text-sm font-medium text-slate-500 mb-1">Đã nghỉ việc</p>
-                <h3 class="text-3xl font-bold text-slate-800">{{ inactiveCount() }}</h3>
-              </div>
-              <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl">🚫</div>
-            </div>
-            <div class="mt-4 flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-              Đã chấm dứt hợp đồng
-            </div>
+          <div class="mt-4 flex items-center gap-1.5 text-xs text-emerald-600 font-medium bg-emerald-50 inline-block px-2 py-1 rounded-md">
+            <span>↗</span> <span>Cập nhật mới</span>
           </div>
         </div>
 
-        <!-- Removed Employee Table (Moved to EmployeeListComponent) -->
-        <div class="mt-8 text-center bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
-          <h3 class="text-lg font-semibold text-slate-800">Quản lý Nhân sự Chi tiết</h3>
-          <p class="text-slate-500 mt-2 mb-4">Vui lòng truy cập trang Nhân viên để xem danh sách chi tiết, thêm mới, hoặc chỉnh sửa thông tin.</p>
-          <a routerLink="/admin/employee" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-xl transition-colors">
-            Chuyển đến Nhân viên ➔
-          </a>
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
+          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium text-slate-500 mb-1">Đang hoạt động</p>
+              <h3 class="text-3xl font-bold text-slate-800">{{ activeCount() }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">✅</div>
+          </div>
+          <div class="mt-4 text-xs text-slate-500 font-medium">Tình trạng làm việc bình thường</div>
         </div>
-        
-        <!-- Footer -->
-        <div class="mt-8 text-center">
-          <p class="text-slate-600 text-xs">
-            HRM System — Fullstack .NET 10 + Angular (Role Based UI)
-          </p>
+
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
+          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium text-slate-500 mb-1">Nghỉ phép</p>
+              <h3 class="text-3xl font-bold text-slate-800">{{ onLeaveCount() }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">⛱️</div>
+          </div>
+          <div class="mt-4 text-xs text-slate-500 font-medium">Tạm thời vắng mặt</div>
         </div>
-      </main>
+
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
+          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-rose-500/10 to-red-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium text-slate-500 mb-1">Đã nghỉ việc</p>
+              <h3 class="text-3xl font-bold text-slate-800">{{ inactiveCount() }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl">🚫</div>
+          </div>
+          <div class="mt-4 text-xs text-slate-500 font-medium">Đã chấm dứt hợp đồng</div>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <a routerLink="/admin/nhan-vien" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group cursor-pointer">
+          <div class="flex items-center gap-4 mb-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">👥</div>
+            <h4 class="text-base font-bold text-slate-800">Nhân viên</h4>
+          </div>
+          <p class="text-sm text-slate-500">Xem, thêm, sửa, xóa thông tin nhân viên.</p>
+        </a>
+        <a routerLink="/admin/phong-ban" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group cursor-pointer">
+          <div class="flex items-center gap-4 mb-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">🏢</div>
+            <h4 class="text-base font-bold text-slate-800">Phòng ban</h4>
+          </div>
+          <p class="text-sm text-slate-500">Quản lý cơ cấu tổ chức phòng ban.</p>
+        </a>
+        <a routerLink="/admin/vat-tu" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group cursor-pointer">
+          <div class="flex items-center gap-4 mb-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">📦</div>
+            <h4 class="text-base font-bold text-slate-800">Vật tư</h4>
+          </div>
+          <p class="text-sm text-slate-500">Quản lý thiết bị, vật tư công ty.</p>
+        </a>
+      </div>
     </div>
-
-    <!-- Removed Modal Form from Dashboard -->
   `,
   styles: [`
     :host {
@@ -182,6 +177,8 @@ export class HrDashboardComponent implements OnInit {
   private employeeService = inject(EmployeeService);
   private departmentService = inject(DepartmentService);
   private positionService = inject(PositionService);
+  private attendanceService = inject(AttendanceService);
+  private authService = inject(AuthService);
   private router = inject(Router);
 
   // ==========================================
@@ -218,6 +215,16 @@ export class HrDashboardComponent implements OnInit {
   formError = signal('');
   todayDateStr = new Date().toISOString().split('T')[0];
 
+  // Self Attendance State
+  todayDate = new Date();
+  myTodayAttendance = signal<AttendanceDTO | null>(null);
+  attendanceLoading = signal(true);
+  actionLoading = signal(false);
+
+  isAdminOrHR = computed(() => {
+    return this.authService.hasRole('Admin') || this.authService.hasRole('HR');
+  });
+
   // === XỬ LÝ LỌC & TÌM KIẾM BẰNG BACKEND ===
 
   onSearch(term: string) {
@@ -253,25 +260,64 @@ export class HrDashboardComponent implements OnInit {
   // ==========================================
   // ROLE-BASED UI
   // ==========================================
-  private authService = inject(AuthService);
-  isAdminOrHR = computed(() => {
-    return this.authService.hasRole('Admin') || this.authService.hasRole('HR');
-  });
 
   // ==========================================
   // LIFECYCLE
   // ==========================================
   ngOnInit(): void {
-    this.loadData();
-    this.loadLookups();
+    this.employeeState.loadEmployees();
+    this.departmentService.getAll().subscribe(data => this.departments.set(data));
+    this.positionService.getAll().subscribe(data => this.positions.set(data));
+    this.loadMyAttendance();
   }
 
   // ==========================================
   // DATA FETCHER
   // ==========================================
-  loadData(): void {
-    // Kích hoạt action load dữ liệu từ State Store
+  loadData() {
     this.employeeState.loadEmployees();
+  }
+
+  loadMyAttendance() {
+    this.attendanceLoading.set(true);
+    this.attendanceService.getMyToday().subscribe({
+      next: (res) => {
+        this.myTodayAttendance.set(res);
+        this.attendanceLoading.set(false);
+      },
+      error: () => {
+        this.myTodayAttendance.set(null);
+        this.attendanceLoading.set(false);
+      }
+    });
+  }
+
+  doCheckIn() {
+    this.actionLoading.set(true);
+    this.attendanceService.checkIn().subscribe({
+      next: () => {
+        this.actionLoading.set(false);
+        this.loadMyAttendance();
+      },
+      error: (err) => {
+        alert(err.error?.message || 'Có lỗi xảy ra');
+        this.actionLoading.set(false);
+      }
+    });
+  }
+
+  doCheckOut() {
+    this.actionLoading.set(true);
+    this.attendanceService.checkOut().subscribe({
+      next: () => {
+        this.actionLoading.set(false);
+        this.loadMyAttendance();
+      },
+      error: (err) => {
+        alert(err.error?.message || 'Có lỗi xảy ra');
+        this.actionLoading.set(false);
+      }
+    });
   }
 
   loadLookups(): void {

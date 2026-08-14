@@ -28,6 +28,14 @@ export const routes: Routes = [
         path: 'vat-tu',
         loadComponent: () => import('./pages/asset/asset-list.component').then(m => m.AssetListComponent)
       },
+      {
+        path: 'cham-cong',
+        loadComponent: () => import('./pages/attendance/attendance-list.component').then(m => m.AttendanceListComponent)
+      },
+      {
+        path: 'nghi-phep',
+        loadComponent: () => import('./pages/leave-request/leave-request-list.component').then(m => m.LeaveRequestListComponent)
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

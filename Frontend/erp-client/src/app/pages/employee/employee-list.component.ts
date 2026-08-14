@@ -175,7 +175,7 @@ import { AuthService } from '../../services/auth.service';
                 </div>
                 <div class="space-y-1.5">
                   <label class="text-sm font-medium text-slate-700">Ngày vào làm <span class="text-rose-500">*</span></label>
-                  <input type="date" formControlName="hireDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2">
+                  <input type="date" formControlName="hireDate" [max]="todayDateStr" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2">
                 </div>
                 <div class="space-y-1.5">
                   <label class="text-sm font-medium text-slate-700">Trạng thái <span class="text-rose-500">*</span></label>
@@ -292,16 +292,31 @@ export class EmployeeListComponent implements OnInit {
     if (this.employeeForm.invalid) return;
     this.isSaving.set(true);
     const data = this.employeeForm.getRawValue() as any;
+    
+    // Convert empty strings to null for backend validation
+    if (!data.email) data.email = null;
+    if (!data.phoneNumber) data.phoneNumber = null;
+    if (!data.employeeId) data.employeeId = null;
+
+    const handleError = (err: any) => {
+      let msg = err.error?.message || 'Lỗi hệ thống';
+      if (err.error?.errors) {
+        const firstKey = Object.keys(err.error.errors)[0];
+        msg = err.error.errors[firstKey][0];
+      }
+      this.formError.set(msg);
+      this.isSaving.set(false);
+    };
 
     if (this.isEditMode()) {
       this.employeeService.update(data.employeeId, data).subscribe({
         next: () => { this.closeModal(); this.employeeState.loadEmployees(); this.isSaving.set(false); },
-        error: (err) => { this.formError.set(err.error?.message || 'Lỗi'); this.isSaving.set(false); }
+        error: handleError
       });
     } else {
       this.employeeService.create(data).subscribe({
         next: () => { this.closeModal(); this.employeeState.loadEmployees(); this.isSaving.set(false); },
-        error: (err) => { this.formError.set(err.error?.message || 'Lỗi'); this.isSaving.set(false); }
+        error: handleError
       });
     }
   }
