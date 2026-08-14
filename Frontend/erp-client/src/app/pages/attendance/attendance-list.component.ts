@@ -44,12 +44,7 @@ import { AuthService } from '../../services/auth.service';
             <option value="Vắng mặt">Vắng mặt</option>
             <option value="Nghỉ phép">Nghỉ phép</option>
           </select>
-          @if (isAdminOrHR()) {
-            <button (click)="openCreateModal()"
-              class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/20">
-              + Thêm chấm công
-            </button>
-          }
+
         </div>
       </div>
 
@@ -122,64 +117,7 @@ import { AuthService } from '../../services/auth.service';
       </div>
     </div>
 
-    <!-- Modal Thêm Chấm Công -->
-    @if (isModalOpen()) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-6">
-          <h3 class="text-lg font-bold text-slate-800 mb-4">➕ Thêm Chấm Công</h3>
-          @if (formError()) {
-            <div class="mb-4 p-3 bg-red-50 text-red-600 rounded-xl text-sm">{{ formError() }}</div>
-          }
-          <form [formGroup]="attendanceForm" (ngSubmit)="submitForm()">
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Mã nhân viên</label>
-                <input formControlName="employeeId" type="text" placeholder="VD: NV_04_M"
-                  class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Ngày</label>
-                <input formControlName="date" type="date"
-                  class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
-              </div>
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-1">Giờ vào</label>
-                  <input formControlName="checkIn" type="time"
-                    class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-1">Giờ ra</label>
-                  <input formControlName="checkOut" type="time"
-                    class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Trạng thái</label>
-                <select formControlName="status"
-                  class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30">
-                  <option value="Đúng giờ">Đúng giờ</option>
-                  <option value="Đi trễ">Đi trễ</option>
-                  <option value="Vắng mặt">Vắng mặt</option>
-                  <option value="Nghỉ phép">Nghỉ phép</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Ghi chú</label>
-                <input formControlName="note" type="text" placeholder="Tùy chọn..."
-                  class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
-              </div>
-            </div>
-            <div class="flex justify-end gap-3 mt-6">
-              <button type="button" (click)="closeModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-all">Hủy</button>
-              <button type="submit" [disabled]="isSaving()" class="px-6 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50">
-                {{ isSaving() ? 'Đang lưu...' : 'Lưu' }}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    }
+
   `,
   styles: [`
     :host { display: block; }
@@ -205,19 +143,7 @@ export class AttendanceListComponent implements OnInit {
   filterStatus = '';
   filterDate = '';
 
-  // Modal
-  isModalOpen = signal(false);
-  isSaving = signal(false);
-  formError = signal('');
 
-  attendanceForm = new FormGroup({
-    employeeId: new FormControl('', [Validators.required]),
-    date: new FormControl('', [Validators.required]),
-    checkIn: new FormControl(''),
-    checkOut: new FormControl(''),
-    status: new FormControl('Đúng giờ', [Validators.required]),
-    note: new FormControl('')
-  });
 
   isAdminOrHR = computed(() => this.authService.hasRole('Admin') || this.authService.hasRole('HR'));
 
@@ -290,51 +216,8 @@ export class AttendanceListComponent implements OnInit {
     }
   }
 
-  openCreateModal() {
-    this.formError.set('');
-    this.attendanceForm.reset({ status: 'Đúng giờ' });
-    this.isModalOpen.set(true);
-  }
-
-  closeModal() {
-    this.isModalOpen.set(false);
-  }
-
-  submitForm() {
-    if (this.attendanceForm.invalid) {
-      this.attendanceForm.markAllAsTouched();
-      return;
-    }
-    this.isSaving.set(true);
-    this.formError.set('');
-
-    const f = this.attendanceForm.value;
-    const dateStr = f.date!;
-
-    const dto: AttendanceInputDTO = {
-      employeeId: f.employeeId!,
-      date: dateStr,
-      checkIn: f.checkIn ? `${dateStr}T${f.checkIn}:00` : null,
-      checkOut: f.checkOut ? `${dateStr}T${f.checkOut}:00` : null,
-      status: f.status!,
-      note: f.note || null
-    };
-
-    this.attendanceService.create(dto).subscribe({
-      next: () => {
-        this.isSaving.set(false);
-        this.closeModal();
-        this.loadData();
-      },
-      error: (err) => {
-        this.isSaving.set(false);
-        this.formError.set(err.error?.message || 'Đã xảy ra lỗi.');
-      }
-    });
-  }
-
   deleteAttendance(id: number) {
-    if (confirm('Bạn có chắc muốn xóa bản ghi chấm công này?')) {
+    if (confirm('Chắc chắn muốn xóa lượt chấm công này?')) {
       this.attendanceService.delete(id).subscribe({
         next: () => this.loadData(),
         error: () => alert('Lỗi khi xóa.')
