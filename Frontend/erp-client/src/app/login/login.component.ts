@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
@@ -125,28 +125,72 @@ export class LoginComponent {
 
   private router = inject(Router);
   private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
   isLoggingIn = false;
+  private loginTimer: any = null;
 
   onLogin(usernameVal: string, passwordVal: string): void {
+    console.log('Login attempt started:', usernameVal);
     // Validate
     if (!usernameVal.trim() || !passwordVal.trim()) {
       this.errorMessage = 'Vui lòng nhập đầy đủ tài khoản và mật khẩu.';
+      this.cdr.detectChanges();
       return;
     }
 
     this.isLoggingIn = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
+    let done = false;
 
-    this.authService.login(usernameVal, passwordVal).subscribe({
-      next: () => {
+    // Safety net: nếu sau 5 giây mà chưa có phản hồi → tự hiện lỗi
+    this.loginTimer = setTimeout(() => {
+      console.log('Timeout triggered! done =', done);
+      if (!done) {
+        done = true;
         this.isLoggingIn = false;
-        this.router.navigate(['/admin/dashboard']);
-      },
-      error: (err) => {
-        this.isLoggingIn = false;
-        this.errorMessage = err.error?.message || 'Tên đăng nhập hoặc mật khẩu không đúng.';
+        this.errorMessage = 'Không thể kết nối đến máy chủ. Vui lòng thử lại sau!';
+        this.cdr.detectChanges();
       }
-    });
+    }, 5000);
+
+    try {
+      this.authService.login(usernameVal, passwordVal).subscribe({
+        next: () => {
+          console.log('Login success');
+          done = true;
+          clearTimeout(this.loginTimer);
+          this.isLoggingIn = false;
+          this.cdr.detectChanges();
+          this.router.navigate(['/admin/dashboard']);
+        },
+        error: (err) => {
+          console.log('Login error received:', err);
+          done = true;
+          clearTimeout(this.loginTimer);
+          this.isLoggingIn = false;
+          
+          try {
+            let msg = err?.error?.message || 'Tên đăng nhập hoặc mật khẩu không đúng.';
+            if (typeof msg === 'string' && !msg.toLowerCase().includes('vui lòng')) {
+              msg += ' Vui lòng nhập lại!';
+            }
+            this.errorMessage = msg;
+          } catch (e) {
+            console.error('Error processing error message', e);
+            this.errorMessage = 'Tên đăng nhập hoặc mật khẩu không đúng. Vui lòng nhập lại!';
+          }
+          this.cdr.detectChanges();
+        }
+      });
+    } catch (e) {
+      console.error('Exception during login subscribe', e);
+      done = true;
+      clearTimeout(this.loginTimer);
+      this.isLoggingIn = false;
+      this.errorMessage = 'Đã xảy ra lỗi không xác định. Vui lòng thử lại!';
+      this.cdr.detectChanges();
+    }
   }
 }
 
