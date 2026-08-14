@@ -30,6 +30,8 @@ public class AssetController : ControllerBase
         }
 
         var assets = await query
+            .OrderByDescending(a => a.AssetId.Length)
+            .ThenByDescending(a => a.AssetId)
             .Select(a => new AssetDTO
             {
                 AssetId = a.AssetId,

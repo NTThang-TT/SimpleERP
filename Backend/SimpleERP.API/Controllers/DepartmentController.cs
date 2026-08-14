@@ -23,6 +23,8 @@ public class DepartmentController : ControllerBase
     public async Task<ActionResult<List<DepartmentDTO>>> GetDepartments()
     {
         var departments = await _context.Departments
+            .OrderByDescending(d => d.DepartmentId.Length)
+            .ThenByDescending(d => d.DepartmentId)
             .Select(d => new DepartmentDTO
             {
                 DepartmentId = d.DepartmentId,

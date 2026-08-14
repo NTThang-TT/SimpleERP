@@ -40,7 +40,8 @@ public class EmployeeRepository : IEmployeeRepository
         var totalCount = await query.CountAsync();
         // 3. Paginate & Project
         var items = await query
-            .OrderBy(e => e.EmployeeId)
+            .OrderByDescending(e => e.EmployeeId.Length)
+            .ThenByDescending(e => e.EmployeeId)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .Select(e => new EmployeeDTO
