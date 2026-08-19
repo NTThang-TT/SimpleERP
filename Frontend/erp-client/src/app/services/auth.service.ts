@@ -56,6 +56,35 @@ export class AuthService {
     return userRole === role;
   }
 
+  isAdmin(): boolean {
+    return this.hasRole('Admin');
+  }
+
+  isHR(): boolean {
+    return this.hasRole('HR');
+  }
+
+  isEmployee(): boolean {
+    const role = this.getRole();
+    return role === 'Employee' || role === null;
+  }
+
+  isAdminOrHR(): boolean {
+    return this.isAdmin() || this.isHR();
+  }
+
+  getEmployeeId(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const idClaim = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+      return payload[idClaim] || payload.sub || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   refreshToken(): Observable<{ token: string, refreshToken: string }> {
     const token = this.getToken();
     const refreshToken = this.getRefreshToken();

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,9 +23,10 @@ public class LeaveRequestController : ControllerBase
     }
 
     /// <summary>
-    /// Lấy danh sách đơn nghỉ phép — có Search, Filter, Pagination
+    /// Lấy danh sách đơn nghỉ phép — chỉ Admin/HR (có Search, Filter, Pagination)
     /// </summary>
     [HttpGet]
+    [Authorize(Roles = "Admin, HR")]
     public async Task<ActionResult<PagedResultDTO<LeaveRequestDTO>>> GetLeaveRequests(
         [FromQuery] string? search = null,
         [FromQuery] string? status = null,
@@ -82,6 +84,54 @@ public class LeaveRequestController : ControllerBase
             PageSize = pageSize
         });
     }
+
+    /// <summary>
+    /// Lấy danh sách đơn nghỉ phép CỦA CHÍNH MÌNH (cho Employee)
+    /// </summary>
+    [HttpGet("my-requests")]
+    public async Task<ActionResult<PagedResultDTO<LeaveRequestDTO>>> GetMyLeaveRequests(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        var employeeId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("EmployeeId");
+        if (string.IsNullOrEmpty(employeeId)) return Unauthorized();
+
+        var query = _context.LeaveRequests
+            .Include(lr => lr.Employee!)
+                .ThenInclude(e => e.Department)
+            .Where(lr => lr.EmployeeId == employeeId);
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderByDescending(lr => lr.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(lr => new LeaveRequestDTO
+            {
+                LeaveRequestId = lr.LeaveRequestId,
+                EmployeeId = lr.EmployeeId,
+                EmployeeFullName = lr.Employee!.FullName,
+                DepartmentName = lr.Employee.Department!.DepartmentName,
+                LeaveType = lr.LeaveType,
+                StartDate = lr.StartDate,
+                EndDate = lr.EndDate,
+                Reason = lr.Reason,
+                Status = lr.Status,
+                ApprovedBy = lr.ApprovedBy,
+                CreatedAt = lr.CreatedAt
+            })
+            .ToListAsync();
+
+        return Ok(new PagedResultDTO<LeaveRequestDTO>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            PageNumber = page,
+            PageSize = pageSize
+        });
+    }
+
 
     /// <summary>
     /// Lấy chi tiết 1 đơn nghỉ phép

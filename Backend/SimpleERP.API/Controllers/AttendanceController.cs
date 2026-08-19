@@ -23,9 +23,10 @@ public class AttendanceController : ControllerBase
     }
 
     /// <summary>
-    /// Lấy danh sách chấm công — có Search, Filter, Pagination
+    /// Lấy danh sách chấm công — chỉ Admin/HR (có Search, Filter, Pagination)
     /// </summary>
     [HttpGet]
+    [Authorize(Roles = "Admin, HR")]
     public async Task<ActionResult<PagedResultDTO<AttendanceDTO>>> GetAttendances(
         [FromQuery] string? search = null,
         [FromQuery] string? departmentId = null,
@@ -87,6 +88,52 @@ public class AttendanceController : ControllerBase
             PageSize = pageSize
         });
     }
+
+    /// <summary>
+    /// Lấy lịch sử chấm công CỦA CHÍNH MÌNH (cho Employee)
+    /// </summary>
+    [HttpGet("my-history")]
+    public async Task<ActionResult<PagedResultDTO<AttendanceDTO>>> GetMyAttendanceHistory(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        var employeeId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("EmployeeId");
+        if (string.IsNullOrEmpty(employeeId)) return Unauthorized();
+
+        var query = _context.Attendances
+            .Include(a => a.Employee!)
+                .ThenInclude(e => e.Department)
+            .Where(a => a.EmployeeId == employeeId);
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderByDescending(a => a.Date)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(a => new AttendanceDTO
+            {
+                AttendanceId = a.AttendanceId,
+                EmployeeId = a.EmployeeId,
+                EmployeeFullName = a.Employee!.FullName,
+                DepartmentName = a.Employee.Department!.DepartmentName,
+                Date = a.Date,
+                CheckIn = a.CheckIn,
+                CheckOut = a.CheckOut,
+                Status = a.Status,
+                Note = a.Note
+            })
+            .ToListAsync();
+
+        return Ok(new PagedResultDTO<AttendanceDTO>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            PageNumber = page,
+            PageSize = pageSize
+        });
+    }
+
 
     /// <summary>
     /// Lấy chi tiết 1 bản ghi chấm công

@@ -59,6 +59,13 @@ export class LeaveRequestService {
     return this.http.get<PagedResult<LeaveRequestDTO>>(this.baseUrl, { params: httpParams });
   }
 
+  getMyRequests(params: { page?: number; pageSize?: number }): Observable<PagedResult<LeaveRequestDTO>> {
+    let httpParams = new HttpParams();
+    if (params.page) httpParams = httpParams.set('page', params.page.toString());
+    if (params.pageSize) httpParams = httpParams.set('pageSize', params.pageSize.toString());
+    return this.http.get<PagedResult<LeaveRequestDTO>>(`${this.baseUrl}/my-requests`, { params: httpParams });
+  }
+
   getById(id: number): Observable<LeaveRequestDTO> {
     return this.http.get<LeaveRequestDTO>(`${this.baseUrl}/${id}`);
   }

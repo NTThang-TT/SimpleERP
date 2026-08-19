@@ -13,31 +13,33 @@ import { AuthService } from '../../services/auth.service';
       <!-- Header -->
       <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50/50">
         <div>
-          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">📋 Đơn Xin Nghỉ Phép</h2>
-          <p class="text-sm text-slate-500 mt-1">Quản lý đơn xin nghỉ phép của nhân viên</p>
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">📋 {{ isAdminOrHR() ? 'Đơn Xin Nghỉ Phép' : 'Đơn Nghỉ Phép Của Tôi' }}</h2>
+          <p class="text-sm text-slate-500 mt-1">{{ isAdminOrHR() ? 'Quản lý đơn xin nghỉ phép của nhân viên' : 'Xem và tạo đơn xin nghỉ phép' }}</p>
         </div>
         <div class="flex items-center gap-3 flex-wrap">
-          <!-- Search -->
-          <input type="text" placeholder="🔍 Tìm theo tên NV..."
-            class="px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 w-48"
-            (input)="onSearch($event)">
-          <!-- Filter Status -->
-          <select class="px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
-            (change)="onStatusChange($event)">
-            <option value="all">Tất cả trạng thái</option>
-            <option value="Chờ duyệt">Chờ duyệt</option>
-            <option value="Đã duyệt">Đã duyệt</option>
-            <option value="Từ chối">Từ chối</option>
-          </select>
-          <!-- Filter Leave Type -->
-          <select class="px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
-            (change)="onTypeChange($event)">
-            <option value="all">Tất cả loại nghỉ</option>
-            <option value="Nghỉ phép năm">Nghỉ phép năm</option>
-            <option value="Nghỉ ốm">Nghỉ ốm</option>
-            <option value="Nghỉ không lương">Nghỉ không lương</option>
-            <option value="Nghỉ việc riêng">Nghỉ việc riêng</option>
-          </select>
+          @if (isAdminOrHR()) {
+            <!-- Search -->
+            <input type="text" placeholder="🔍 Tìm theo tên NV..."
+              class="px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 w-48"
+              (input)="onSearch($event)">
+            <!-- Filter Status -->
+            <select class="px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+              (change)="onStatusChange($event)">
+              <option value="all">Tất cả trạng thái</option>
+              <option value="Chờ duyệt">Chờ duyệt</option>
+              <option value="Đã duyệt">Đã duyệt</option>
+              <option value="Từ chối">Từ chối</option>
+            </select>
+            <!-- Filter Leave Type -->
+            <select class="px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+              (change)="onTypeChange($event)">
+              <option value="all">Tất cả loại nghỉ</option>
+              <option value="Nghỉ phép năm">Nghỉ phép năm</option>
+              <option value="Nghỉ ốm">Nghỉ ốm</option>
+              <option value="Nghỉ không lương">Nghỉ không lương</option>
+              <option value="Nghỉ việc riêng">Nghỉ việc riêng</option>
+            </select>
+          }
           <button (click)="openCreateModal()"
             class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/20">
             + Tạo đơn nghỉ phép
@@ -242,21 +244,39 @@ export class LeaveRequestListComponent implements OnInit {
 
   loadData() {
     this.isLoading.set(true);
-    this.leaveService.getAll({
-      search: this.searchTerm || undefined,
-      status: this.filterStatus || undefined,
-      leaveType: this.filterType || undefined,
-      page: this.currentPage(),
-      pageSize: this.pageSize
-    }).subscribe({
-      next: (res) => {
-        this.items.set(res.items);
-        this.totalCount.set(res.totalCount);
-        this.totalPages.set(res.totalPages);
-        this.isLoading.set(false);
-      },
-      error: () => this.isLoading.set(false)
-    });
+
+    // Employee chỉ xem đơn nghỉ phép của chính mình
+    if (this.authService.isEmployee()) {
+      this.leaveService.getMyRequests({
+        page: this.currentPage(),
+        pageSize: this.pageSize
+      }).subscribe({
+        next: (res) => {
+          this.items.set(res.items);
+          this.totalCount.set(res.totalCount);
+          this.totalPages.set(res.totalPages);
+          this.isLoading.set(false);
+        },
+        error: () => this.isLoading.set(false)
+      });
+    } else {
+      // Admin/HR xem tất cả
+      this.leaveService.getAll({
+        search: this.searchTerm || undefined,
+        status: this.filterStatus || undefined,
+        leaveType: this.filterType || undefined,
+        page: this.currentPage(),
+        pageSize: this.pageSize
+      }).subscribe({
+        next: (res) => {
+          this.items.set(res.items);
+          this.totalCount.set(res.totalCount);
+          this.totalPages.set(res.totalPages);
+          this.isLoading.set(false);
+        },
+        error: () => this.isLoading.set(false)
+      });
+    }
   }
 
   onSearch(event: Event) {

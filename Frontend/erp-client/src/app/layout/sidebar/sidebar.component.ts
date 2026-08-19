@@ -39,19 +39,19 @@ import { AuthService } from '../../services/auth.service';
               <span class="nav-label" *ngIf="!collapsed()">Dashboard</span>
             </a>
           </li>
-          <li>
+          <li *ngIf="isAdminOrHR">
             <a routerLink="/admin/nhan-vien" routerLinkActive="active" class="nav-item" [title]="collapsed() ? 'Nhân viên' : ''">
               <span class="nav-icon">👥</span>
               <span class="nav-label" *ngIf="!collapsed()">Nhân viên</span>
             </a>
           </li>
-          <li>
+          <li *ngIf="isAdminOrHR">
             <a routerLink="/admin/phong-ban" routerLinkActive="active" class="nav-item" [title]="collapsed() ? 'Phòng ban' : ''">
               <span class="nav-icon">🏢</span>
               <span class="nav-label" *ngIf="!collapsed()">Phòng ban</span>
             </a>
           </li>
-          <li>
+          <li *ngIf="isAdminOrHR">
             <a routerLink="/admin/vat-tu" routerLinkActive="active" class="nav-item" [title]="collapsed() ? 'Vật tư' : ''">
               <span class="nav-icon">📦</span>
               <span class="nav-label" *ngIf="!collapsed()">Vật tư</span>
@@ -308,6 +308,10 @@ export class SidebarComponent {
 
   /** Two-way binding with parent via model signal */
   collapsed = model<boolean>(false);
+
+  get isAdminOrHR(): boolean {
+    return this.authService.isAdminOrHR();
+  }
 
   toggle() {
     this.collapsed.update(v => !v);

@@ -73,6 +73,13 @@ export class AttendanceService {
 
   // --- Chấm công cá nhân ---
 
+  getMyHistory(params: { page?: number; pageSize?: number }): Observable<PagedResult<AttendanceDTO>> {
+    let httpParams = new HttpParams();
+    if (params.page) httpParams = httpParams.set('page', params.page.toString());
+    if (params.pageSize) httpParams = httpParams.set('pageSize', params.pageSize.toString());
+    return this.http.get<PagedResult<AttendanceDTO>>(`${this.baseUrl}/my-history`, { params: httpParams });
+  }
+
   getMyToday(): Observable<AttendanceDTO> {
     return this.http.get<AttendanceDTO>(`${this.baseUrl}/my-today`);
   }

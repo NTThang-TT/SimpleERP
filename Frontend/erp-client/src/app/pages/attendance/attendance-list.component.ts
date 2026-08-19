@@ -15,10 +15,10 @@ import { AuthService } from '../../services/auth.service';
       <!-- Header -->
       <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50/50">
         <div>
-          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">🕐 Bảng Chấm Công</h2>
-          <p class="text-sm text-slate-500 mt-1">Quản lý chấm công hàng ngày của nhân viên</p>
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">🕐 {{ isAdminOrHR() ? 'Bảng Chấm Công' : 'Lịch sử Chấm Công' }}</h2>
+          <p class="text-sm text-slate-500 mt-1">{{ isAdminOrHR() ? 'Quản lý chấm công hàng ngày của nhân viên' : 'Lịch sử chấm công của bạn' }}</p>
         </div>
-        <div class="flex items-center gap-3 flex-wrap">
+        <div class="flex items-center gap-3 flex-wrap" *ngIf="isAdminOrHR()">
           <!-- Search -->
           <input type="text" placeholder="🔍 Tìm theo tên NV..."
             class="px-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 w-48"
@@ -159,22 +159,40 @@ export class AttendanceListComponent implements OnInit {
 
   loadData() {
     this.isLoading.set(true);
-    this.attendanceService.getAll({
-      search: this.searchTerm || undefined,
-      departmentId: this.filterDept || undefined,
-      status: this.filterStatus || undefined,
-      date: this.filterDate || undefined,
-      page: this.currentPage(),
-      pageSize: this.pageSize
-    }).subscribe({
-      next: (res) => {
-        this.items.set(res.items);
-        this.totalCount.set(res.totalCount);
-        this.totalPages.set(res.totalPages);
-        this.isLoading.set(false);
-      },
-      error: () => this.isLoading.set(false)
-    });
+
+    // Employee chỉ xem lịch sử chấm công của chính mình
+    if (this.authService.isEmployee()) {
+      this.attendanceService.getMyHistory({
+        page: this.currentPage(),
+        pageSize: this.pageSize
+      }).subscribe({
+        next: (res) => {
+          this.items.set(res.items);
+          this.totalCount.set(res.totalCount);
+          this.totalPages.set(res.totalPages);
+          this.isLoading.set(false);
+        },
+        error: () => this.isLoading.set(false)
+      });
+    } else {
+      // Admin/HR xem tất cả
+      this.attendanceService.getAll({
+        search: this.searchTerm || undefined,
+        departmentId: this.filterDept || undefined,
+        status: this.filterStatus || undefined,
+        date: this.filterDate || undefined,
+        page: this.currentPage(),
+        pageSize: this.pageSize
+      }).subscribe({
+        next: (res) => {
+          this.items.set(res.items);
+          this.totalCount.set(res.totalCount);
+          this.totalPages.set(res.totalPages);
+          this.isLoading.set(false);
+        },
+        error: () => this.isLoading.set(false)
+      });
+    }
   }
 
   onSearch(event: Event) {
