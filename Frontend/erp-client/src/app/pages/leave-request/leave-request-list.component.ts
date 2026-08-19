@@ -226,14 +226,9 @@ export class LeaveRequestListComponent implements OnInit {
     return Array.from({ length: total }, (_, i) => i + 1);
   });
 
-  // Get current user's employee ID from JWT
+  // Get current user's employee ID from JWT using AuthService
   get currentEmployeeId(): string {
-    const token = this.authService.getToken();
-    if (!token) return '';
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] || '';
-    } catch { return ''; }
+    return this.authService.getEmployeeId() || '';
   }
 
   ngOnInit() {

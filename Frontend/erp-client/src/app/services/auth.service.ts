@@ -79,7 +79,7 @@ export class AuthService {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const idClaim = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
-      return payload[idClaim] || payload.sub || null;
+      return payload[idClaim] || payload.nameid || payload.sub || payload.EmployeeId || null;
     } catch (e) {
       return null;
     }
