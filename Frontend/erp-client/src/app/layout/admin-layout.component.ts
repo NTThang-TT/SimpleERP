@@ -9,9 +9,12 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [CommonModule, RouterModule, RouterOutlet, SidebarComponent],
   template: `
-    <div class="layout-wrapper">
+    <div class="layout-wrapper" [class.mobile-sidebar-open]="!sidebarCollapsed()">
+      <!-- Mobile Overlay -->
+      <div class="mobile-overlay" (click)="toggleSidebar()"></div>
+
       <!-- Sidebar -->
-      <app-sidebar [(collapsed)]="sidebarCollapsed"></app-sidebar>
+      <app-sidebar class="app-sidebar" [(collapsed)]="sidebarCollapsed"></app-sidebar>
 
       <!-- Main Content Area -->
       <div class="main-area" [class.sidebar-collapsed]="sidebarCollapsed()">
@@ -405,10 +408,35 @@ import { AuthService } from '../services/auth.service';
     .footer-copy { font-weight: 500; }
 
     /* Responsive */
+    .mobile-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(2px);
+      z-index: 40;
+    }
+
     @media (max-width: 768px) {
       .header-user-info { display: none; }
       .live-badge { display: none; }
       .footer-center { display: none; }
+      
+      .layout-wrapper.mobile-sidebar-open .mobile-overlay {
+        display: block;
+      }
+      .app-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 50;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .layout-wrapper.mobile-sidebar-open .app-sidebar {
+        transform: translateX(0);
+      }
     }
   `]
 })
@@ -416,7 +444,7 @@ export class AdminLayoutComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  sidebarCollapsed = signal(false);
+  sidebarCollapsed = signal(window.innerWidth <= 768);
 
   toggleSidebar() {
     this.sidebarCollapsed.update(v => !v);

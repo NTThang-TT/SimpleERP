@@ -71,8 +71,12 @@ import { AttendanceService, AttendanceDTO } from '../services/attendance.service
       <!-- Welcome Section -->
       <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Tổng quan Nhân sự</h2>
-          <p class="text-slate-500 mt-1">Theo dõi tình hình biến động nhân sự trực tiếp từ hệ thống.</p>
+          <h2 class="text-2xl font-bold text-slate-800 tracking-tight">
+            {{ isAdminOrHR() ? 'Tổng quan Nhân sự' : 'Trang chủ Nhân viên' }}
+          </h2>
+          <p class="text-slate-500 mt-1">
+            {{ isAdminOrHR() ? 'Theo dõi tình hình biến động nhân sự trực tiếp từ hệ thống.' : 'Chào mừng bạn đến với SimpleERP.' }}
+          </p>
         </div>
         <div class="flex items-center gap-4">
           @if (isAdminOrHR()) {
@@ -84,7 +88,8 @@ import { AttendanceService, AttendanceDTO } from '../services/attendance.service
       </div>
 
       <!-- KPI Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      @if (isAdminOrHR()) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
           <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
           <div class="flex justify-between items-start">
@@ -135,9 +140,11 @@ import { AttendanceService, AttendanceDTO } from '../services/attendance.service
           <div class="mt-4 text-xs text-slate-500 font-medium">Đã chấm dứt hợp đồng</div>
         </div>
       </div>
+      }
 
       <!-- Quick Links -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      @if (isAdminOrHR()) {
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <a routerLink="/admin/nhan-vien" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group cursor-pointer">
           <div class="flex items-center gap-4 mb-3">
             <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">👥</div>
@@ -160,6 +167,7 @@ import { AttendanceService, AttendanceDTO } from '../services/attendance.service
           <p class="text-sm text-slate-500">Quản lý thiết bị, vật tư công ty.</p>
         </a>
       </div>
+      }
     </div>
   `,
   styles: [`
