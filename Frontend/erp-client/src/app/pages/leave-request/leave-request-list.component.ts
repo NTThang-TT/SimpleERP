@@ -142,10 +142,8 @@ import { AuthService } from '../../services/auth.service';
           }
           <form [formGroup]="leaveForm" (ngSubmit)="submitForm()">
             <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Mã nhân viên</label>
-                <input formControlName="employeeId" type="text" placeholder="VD: NV_04_M"
-                  class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+              <div class="hidden">
+                <input formControlName="employeeId" type="hidden">
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Loại nghỉ</label>
@@ -214,7 +212,7 @@ export class LeaveRequestListComponent implements OnInit {
   formError = signal('');
 
   leaveForm = new FormGroup({
-    employeeId: new FormControl('', [Validators.required]),
+    employeeId: new FormControl(''),
     leaveType: new FormControl('Nghỉ phép năm', [Validators.required]),
     startDate: new FormControl('', [Validators.required]),
     endDate: new FormControl('', [Validators.required]),
@@ -341,7 +339,7 @@ export class LeaveRequestListComponent implements OnInit {
 
     const f = this.leaveForm.value;
     const dto: LeaveRequestInputDTO = {
-      employeeId: f.employeeId!,
+      employeeId: this.currentEmployeeId,
       leaveType: f.leaveType!,
       startDate: f.startDate!,
       endDate: f.endDate!,
