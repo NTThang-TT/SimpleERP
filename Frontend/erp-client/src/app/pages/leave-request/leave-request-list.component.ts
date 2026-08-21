@@ -370,8 +370,14 @@ export class LeaveRequestListComponent implements OnInit {
   deleteRequest(id: number) {
     if (confirm('Bạn có chắc muốn xóa đơn nghỉ phép này?')) {
       this.leaveService.delete(id).subscribe({
-        next: () => this.loadData(),
-        error: (err) => alert(err.error?.message || 'Lỗi khi xóa.')
+        next: () => {
+          alert('Xóa thành công!');
+          this.loadData();
+        },
+        error: (err) => {
+          alert('Chi tiết lỗi: ' + JSON.stringify(err));
+          console.error(err);
+        }
       });
     }
   }
