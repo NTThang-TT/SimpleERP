@@ -17,15 +17,15 @@
 
 Lời đầu tiên, em xin gửi lời cảm ơn chân thành và sâu sắc nhất tới Ban Lãnh đạo Công ty cùng toàn thể các anh chị đồng nghiệp tại đơn vị đã tạo điều kiện thuận lợi, tiếp nhận và hỗ trợ em trong suốt 14 tuần thực tập vừa qua.
 
-Đặc biệt, em xin gửi lời cảm ơn sâu sắc nhất tới **Anh Mentor**, người đã trực tiếp hướng dẫn, định hướng bài toán, chỉ ra những điểm còn thiếu sót và tận tình chia sẻ những kinh nghiệm thực chiến quý báu về tư duy kiến trúc, quy chuẩn mã nguồn sạch cũng như nguyên tắc bảo mật phần mềm. Những lời nhận xét và góp ý sát sao của anh chính là động lực lớn giúp em hoàn thiện đồ án **SimpleERP** một cách nghiêm túc và bài bản nhất.
+Đặc biệt, em xin gửi lời cảm ơn sâu sắc nhất tới **Anh Thiện**, người đã trực tiếp hướng dẫn, định hướng bài toán, chỉ ra những điểm còn thiếu sót và tận tình chia sẻ những kinh nghiệm thực chiến quý báu về tư duy kiến trúc, quy chuẩn mã nguồn sạch cũng như nguyên tắc bảo mật phần mềm. Những lời nhận xét và góp ý sát sao của anh chính là động lực lớn giúp em hoàn thiện đồ án **SimpleERP** một cách nghiêm túc và bài bản nhất.
 
 Em cũng xin gửi lời tri ân đến các Thầy Cô giáo trong Khoa Công nghệ Thông tin đã trang bị cho em nền tảng kiến thức lý thuyết vững chắc về cấu trúc dữ liệu, giải thuật, cơ sở dữ liệu và công nghệ phần mềm trong suốt những năm tháng trên giảng đường.
 
 Dù đã rất nỗ lực hoàn thiện đề tài, song do thời gian và kinh nghiệm thực tế còn hạn chế, báo cáo khó tránh khỏi những thiếu sót nhất định. Em rất mong nhận được những ý kiến đóng góp quý báu từ quý Thầy Cô và Hội đồng để đồ án được hoàn thiện hơn nữa.
 
-*Hà Nội, Tháng 09 năm 2026*  
+*Hồ Chi Minh, Tháng 09 năm 2026*  
 **Sinh viên thực hiện**  
-*Nguyễn Tiến Thắng*
+*Nguyễn Tất Thắng*
 
 ---
 
