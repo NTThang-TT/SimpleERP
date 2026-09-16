@@ -71,8 +71,8 @@ Hệ thống đã được nạp sẵn dữ liệu mẫu (Seeded Data). Quý Th�
 
 ### 1. Yêu cầu môi trường
 * [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-* [Node.js](https://nodejs.org/) (Khuyên dùng v18 hoặc v20)
-* [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) (hoặc SQL LocalDB đi kèm Visual Studio)
+* [Node.js](https://nodejs.org/) 
+* [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) 
 
 ### 2. Khởi chạy Backend (.NET 8 Web API)
 ```bash
