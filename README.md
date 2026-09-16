@@ -93,7 +93,7 @@ npm start
 
 ---
 
-## 📁 CẤU TRÚC THƯ MỤC DỰ ÁN
+## CẤU TRÚC THƯ MỤC DỰ ÁN
 
 ```
 SimpleERP/
@@ -118,9 +118,9 @@ SimpleERP/
 
 ## 📅 TIẾN ĐỘ HOÀN THÀNH (14 TUẦN THỰC TẬP)
 
-- [x] **Tuần 1 - 4**: Nghiên cứu yêu cầu nghiệp vụ ERP, thiết kế CSDL SQL Server, dựng khung Clean Architecture .NET 8.
-- [x] **Tuần 5 - 8**: Triển khai tầng bảo mật Authentication (BCrypt + JWT + Refresh Token), xây dựng CRUD Phòng ban & Nhân sự (tự sinh mã, xóa mềm).
-- [x] **Tuần 9 - 11**: Phát triển phân hệ Chấm công (quy tắc 8:15 AM, chống chấm công hộ) & Quy trình Nghỉ phép (bảo vệ 2 lớp).
-- [x] **Tuần 12**: Xây dựng Quản lý Vật tư & Thiết bị, hoàn thiện HR Dashboard KPI với Angular Signals.
-- [x] **Tuần 13**: Tối ưu hóa hiệu năng: Phân trang máy chủ chuẩn `IQueryable` có các nút số `[1][2][3]` cho Nhân sự & Vật tư.
-- [x] **Tuần 14**: Kiểm thử toàn diện, bảo vệ Responsive di động, hoàn thiện tài liệu báo cáo tốt nghiệp.
+-  **Tuần 1 - 4**: Nghiên cứu yêu cầu nghiệp vụ ERP, thiết kế CSDL SQL Server, dựng khung Clean Architecture .NET 8.
+-  **Tuần 5 - 8**: Triển khai tầng bảo mật Authentication (BCrypt + JWT + Refresh Token), xây dựng CRUD Phòng ban & Nhân sự (tự sinh mã, xóa mềm).
+-  **Tuần 9 - 11**: Phát triển phân hệ Chấm công (quy tắc 8:15 AM, chống chấm công hộ) & Quy trình Nghỉ phép (bảo vệ 2 lớp).
+-  **Tuần 12**: Xây dựng Quản lý Vật tư & Thiết bị, hoàn thiện HR Dashboard KPI với Angular Signals.
+-  **Tuần 13**: Tối ưu hóa hiệu năng: Phân trang máy chủ chuẩn `IQueryable` có các nút số `[1][2][3]` cho Nhân sự & Vật tư.
+-  **Tuần 14**: Kiểm thử toàn diện, bảo vệ Responsive di động, hoàn thiện tài liệu báo cáo tốt nghiệp.
