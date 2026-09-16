@@ -7,7 +7,7 @@
 
 ---
 
-## 🔑 1. THÔNG TIN TÀI KHOẢN TEST HỆ THỐNG
+##  1. THÔNG TIN TÀI KHOẢN TEST HỆ THỐNG
 
 Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 tài khoản sau để kiểm tra toàn bộ luồng nghiệp vụ:
 
@@ -18,19 +18,19 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
 
 ---
 
-## 💻 2. CHI TIẾT TỪNG PHÂN HỆ CHỨC NĂNG & CÁCH XỬ LÝ KỸ THUẬT
+##  2. CHI TIẾT TỪNG PHÂN HỆ CHỨC NĂNG & CÁCH XỬ LÝ KỸ THUẬT
 
 ---
 
 ### PHÂN HỆ 1: ĐĂNG NHẬP, BẢO MẬT & PHÂN QUYỀN
 
-#### 📌 Chức năng làm được:
+#### Chức năng làm được:
 * Đăng nhập xác thực tài khoản, bắt lỗi sai thông tin trực quan.
 * Đăng xuất xóa sạch phiên làm việc trên trình duyệt.
 * Tự động điều hướng theo quyền: Admin thấy đầy đủ menu quản trị, Employee chỉ thấy các mục cá nhân.
 * **Chặn vượt quyền**: Nhân viên cố tình gõ link `/employees` trên thanh địa chỉ sẽ bị chặn đứng và đá về Dashboard.
 
-#### 🛠️ Kỹ thuật xử lý ở đâu & Dùng cái gì?
+#### Kỹ thuật xử lý ở đâu & Dùng cái gì?
 * **Mã hóa mật khẩu**: Dùng thư viện `BCrypt.Net-Next`. Mật khẩu băm một chiều với Salt ngẫu nhiên trước khi lưu Database. Khi đăng nhập dùng `BCrypt.Verify()` so sánh.
 * **Cấp Token JWT**: Dùng thư viện `System.IdentityModel.Tokens.Jwt` sinh Access Token (sống 2 giờ) chứa Claims (`Id`, `Role`, `Name`), ký bằng thuật toán `HMAC-SHA256`. Refresh Token sống 7 ngày lưu trong SQL Server.
 * **Tự động gắn Token & Silent Refresh**: Tại file `Frontend/.../auth.interceptor.ts`:
@@ -45,11 +45,11 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
 
 ### PHÂN HỆ 2: BẢNG ĐIỀU KHIỂN (HR DASHBOARD)
 
-#### 📌 Chức năng làm được:
+#### Chức năng làm được:
 * Thống kê KPI tổng quan: Tổng nhân sự, Nhân viên đang làm việc, Đang nghỉ phép, Tổng phòng ban, Tổng tài sản.
 * Widget Chấm công 1-chạm: Hiển thị đồng hồ thời gian thực (nhảy từng giây), lời chào buổi sáng/chiều, nút Check-in/Check-out tự đổi trạng thái.
 
-#### 🛠️ Kỹ thuật xử lý ở đâu & Dùng cái gì?
+#### Kỹ thuật xử lý ở đâu & Dùng cái gì?
 * **Angular 19 Signals & Computed**:
   * Thay vì dùng NgRx nặng nề, sử dụng `signal()` chứa dữ liệu gốc từ API và `computed()` để tự động tính toán tổng số nhân viên hoạt động/nghỉ phép.
   * Khi API trả về dữ liệu mới, các con số trên thẻ KPI tự động nhảy số theo thời gian thực, không cần F5.
@@ -62,14 +62,14 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
 
 ### PHÂN HỆ 3: QUẢN LÝ NHÂN SỰ (EMPLOYEE)
 
-#### 📌 Chức năng làm được:
+#### Chức năng làm được:
 * Xem danh sách nhân viên có **thanh phân trang số 1-2-3** và nút "Trước" / "Sau".
 * Tìm kiếm nhân sự theo tên hoặc mã nhân viên.
 * Lọc nhân sự theo phòng ban.
 * Thêm mới nhân viên: Form nhập liệu đầy đủ thông tin cá nhân, chức vụ, phòng ban.
 * Xóa nhân viên khỏi danh sách.
 
-#### 🛠️ Kỹ thuật xử lý ở đâu & Dùng cái gì?
+#### Kỹ thuật xử lý ở đâu & Dùng cái gì?
 * **Thuật toán tự sinh Mã nhân viên**: Người dùng không cần gõ mã. Backend tự phân tích Họ và Tên, lấy các chữ cái đầu viết tắt ghép với số thứ tự: `NV_{STT}_{ChữCáiĐầu}` (VD: "Nguyễn Tiến Thắng" $\rightarrow$ `NV_15_NTT`).
 * **Vòng lặp chống trùng mã (Collision Check)**: Backend chạy vòng lặp `while (await _context.Employees.AnyAsync(e => e.EmployeeCode == code))` để đảm bảo mã sinh ra là duy nhất 100%.
 * **Tự cấp tài khoản mặc định**: Tự sinh Username (`thang.nt`), Email (`thang.nt@company.com`) và mật khẩu mặc định băm BCrypt (`123456`).
@@ -82,12 +82,12 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
 
 ### PHÂN HỆ 4: QUẢN LÝ PHÒNG BAN (DEPARTMENT)
 
-#### 📌 Chức năng làm được:
+#### Chức năng làm được:
 * Xem danh sách tất cả các phòng ban trong công ty.
 * Thêm mới phòng ban, Chỉnh sửa thông tin/mô tả phòng ban.
 * Xóa phòng ban.
 
-#### 🛠️ Kỹ thuật xử lý ở đâu & Dùng cái gì?
+#### Kỹ thuật xử lý ở đâu & Dùng cái gì?
 * **Ràng buộc an toàn dữ liệu CSDL**:
   * Khi bấm xóa, Backend dùng `AnyAsync()` kiểm tra xem phòng ban này còn nhân viên (`Employees`) hay còn tài sản (`Assets`) nào không.
   * Nếu còn $\rightarrow$ Trả về mã lỗi `400 Bad Request` chặn không cho xóa để tránh tạo ra các bản ghi mồ côi làm hỏng CSDL.
@@ -100,14 +100,14 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
 
 ### PHÂN HỆ 5: QUẢN LÝ VẬT TƯ & THIẾT BỊ (ASSET)
 
-#### 📌 Chức năng làm được:
+#### Chức năng làm được:
 * Quản lý danh mục tài sản/máy móc cấp phát cho các phòng ban (Laptop, Bàn ghế, Thiết bị CNTT...).
 * Theo dõi 4 trạng thái: Đang sử dụng, Sẵn sàng cấp phát, Đang bảo trì, Hỏng.
 * Thêm mới, Chỉnh sửa thông tin tài sản, Đơn giá, Số lượng, Ngày mua.
 * Lọc tài sản theo từng Phòng ban và Tìm kiếm theo tên thiết bị.
 * **Thanh phân trang máy chủ số 1-2-3**: Xem từng trang mượt mà.
 
-#### 🛠️ Kỹ thuật xử lý ở đâu & Dùng cái gì?
+#### Kỹ thuật xử lý ở đâu & Dùng cái gì?
 * **Phân trang tại Server bằng `IQueryable`**:
   * Nhận các tham số `page`, `pageSize`, `departmentId`, `search`.
   * Dùng `.Skip((page - 1) * pageSize).Take(pageSize)` để Database tự ngắt trang, chỉ kéo đúng 10 bản ghi về máy khách, tối ưu RAM.
@@ -120,7 +120,7 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
 
 ### PHÂN HỆ 6: QUẢN LÝ CHẤM CÔNG (ATTENDANCE)
 
-#### 📌 Chức năng làm được:
+#### Chức năng làm được:
 * **Giao diện Quản trị viên**:
   * Xem bảng chấm công của toàn bộ nhân viên công ty.
   * **Thanh 4 bộ lọc kết hợp**: Lọc theo Phòng ban + Lọc trạng thái (Đúng giờ/Đi muộn) + Lọc theo Ngày + Tìm theo Tên.
@@ -128,7 +128,7 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
   * Chấm công 1-chạm: Bấm Check-in khi đến công ty, Bấm Check-out khi về.
   * Xem bảng lịch sử chấm công của chính bản thân mình (không thấy của người khác).
 
-#### 🛠️ Kỹ thuật xử lý ở đâu & Dùng cái gì?
+#### Kỹ thuật xử lý ở đâu & Dùng cái gì?
 * **Quy tắc tự động mốc 8:15 AM**:
   * Khi bấm Check-in, Backend lấy giờ hệ thống. Nếu sau `08:15:00` $\rightarrow$ Tự động gắn trạng thái **Đi muộn (`Late`)**; nếu trước 8h15 $\rightarrow$ Gắn trạng thái **Đúng giờ (`OnTime`)**.
 * **Triệt tiêu chấm công hộ**:
@@ -143,7 +143,7 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
 
 ### PHÂN HỆ 7: QUY TRÌNH NGHỈ PHÉP (LEAVE REQUEST)
 
-#### 📌 Chức năng làm được:
+#### Chức năng làm được:
 * **Nhân viên**:
   * Tạo đơn xin nghỉ phép (Chọn loại nghỉ: Phép năm, Nghỉ ốm, Việc riêng; Chọn ngày bắt đầu, ngày kết thúc và lý do).
   * Theo dõi trạng thái đơn: Chờ duyệt (`Pending`), Đã duyệt (`Approved`), Bị từ chối (`Rejected`).
@@ -152,7 +152,7 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
   * Xem danh sách các đơn nghỉ phép đang chờ duyệt.
   * Bấm nút **Duyệt (Approve)** hoặc **Từ chối (Reject)**.
 
-#### 🛠️ Kỹ thuật xử lý ở đâu & Dùng cái gì?
+#### Kỹ thuật xử lý ở đâu & Dùng cái gì?
 * **Cơ chế Bảo vệ 2 lớp chống xóa bậy (Two-Layer Security)**:
   * **Lớp 1 (Giao diện Frontend)**: Dùng `@if (req.status === 'Pending')`. Chỉ khi đơn đang chờ duyệt mới hiện nút "Hủy đơn". Khi đơn đã được duyệt hoặc từ chối, nút Hủy hoàn toàn biến mất.
   * **Lớp 2 (Máy chủ Backend - Chốt chặn an toàn)**: Trong API xóa đơn, Backend kiểm tra lại trong Database:
@@ -169,18 +169,18 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
 
 ### PHÂN HỆ 8: GIAO DIỆN RESPONSIVE & TRẢI NGHIỆM NGƯỜI DÙNG
 
-#### 📌 Chức năng làm được:
+#### Chức năng làm được:
 * Tương thích hoàn hảo trên cả màn hình Desktop, Laptop, Tablet và Mobile.
 * Trên điện thoại di động: Thanh Sidebar tự thu gọn, có nút Menu 3 gạch (Hamburger) bấm trượt ra mượt mà.
 * Các bảng dữ liệu (Bảng Nhân viên, Bảng Vật tư) có thanh cuộn ngang tự động (`overflow-x-auto`), không bị vỡ giao diện trên màn hình nhỏ.
 
 ---
 
-## 🎯 3. TỔNG KẾT TIẾN ĐỘ & TRẠNG THÁI HỆ THỐNG
+## 3. TỔNG KẾT TIẾN ĐỘ & TRẠNG THÁI HỆ THỐNG
 
 * **Tiến độ**: Hoàn thành 100% các phân hệ cam kết.
 * **Biên dịch**:
   * Backend: `dotnet build` $\rightarrow$ **0 Error(s)**.
   * Frontend: `ng build` $\rightarrow$ **0 Error(s)**.
 * **Toàn bộ mã nguồn mới nhất**: Đã được đồng bộ và push lên nhánh `main` tại GitHub:
-  👉 **https://github.com/NTThang-TT/SimpleERP**
+  **https://github.com/NTThang-TT/SimpleERP**
