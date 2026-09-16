@@ -43,7 +43,7 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
 
 ---
 
-### PHÂN HỆ 2: BẢNG ĐIỀU KHIỂN (HR DASHBOARD)
+### PHÂN HỆ 2: BẢNG ĐIỀU KHIỂN 
 
 #### Chức năng làm được:
 * Thống kê KPI tổng quan: Tổng nhân sự, Nhân viên đang làm việc, Đang nghỉ phép, Tổng phòng ban, Tổng tài sản.
@@ -60,7 +60,7 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
 
 ---
 
-### PHÂN HỆ 3: QUẢN LÝ NHÂN SỰ (EMPLOYEE)
+### PHÂN HỆ 3: QUẢN LÝ NHÂN SỰ 
 
 #### Chức năng làm được:
 * Xem danh sách nhân viên có **thanh phân trang số 1-2-3** và nút "Trước" / "Sau".
@@ -80,7 +80,7 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
 
 ---
 
-### PHÂN HỆ 4: QUẢN LÝ PHÒNG BAN (DEPARTMENT)
+### PHÂN HỆ 4: QUẢN LÝ PHÒNG BAN 
 
 #### Chức năng làm được:
 * Xem danh sách tất cả các phòng ban trong công ty.
@@ -98,7 +98,7 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
 
 ---
 
-### PHÂN HỆ 5: QUẢN LÝ VẬT TƯ & THIẾT BỊ (ASSET)
+### PHÂN HỆ 5: QUẢN LÝ VẬT TƯ & THIẾT BỊ 
 
 #### Chức năng làm được:
 * Quản lý danh mục tài sản/máy móc cấp phát cho các phòng ban (Laptop, Bàn ghế, Thiết bị CNTT...).
@@ -118,7 +118,7 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
 
 ---
 
-### PHÂN HỆ 6: QUẢN LÝ CHẤM CÔNG (ATTENDANCE)
+### PHÂN HỆ 6: QUẢN LÝ CHẤM CÔNG 
 
 #### Chức năng làm được:
 * **Giao diện Quản trị viên**:
@@ -141,7 +141,7 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
 
 ---
 
-### PHÂN HỆ 7: QUY TRÌNH NGHỈ PHÉP (LEAVE REQUEST)
+### PHÂN HỆ 7: QUY TRÌNH NGHỈ PHÉP 
 
 #### Chức năng làm được:
 * **Nhân viên**:
@@ -150,7 +150,7 @@ Hệ thống phân quyền rõ rệt thành 2 vai trò. Anh có thể dùng 2 t�
   * Hủy đơn khi có việc đột xuất.
 * **Quản trị viên**:
   * Xem danh sách các đơn nghỉ phép đang chờ duyệt.
-  * Bấm nút **Duyệt (Approve)** hoặc **Từ chối (Reject)**.
+  * Bấm nút **Duyệt** hoặc **Từ chối**.
 
 #### Kỹ thuật xử lý ở đâu & Dùng cái gì?
 * **Cơ chế Bảo vệ 2 lớp chống xóa bậy (Two-Layer Security)**:
