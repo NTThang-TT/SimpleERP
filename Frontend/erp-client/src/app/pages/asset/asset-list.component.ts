@@ -54,7 +54,7 @@ import { SearchBarComponent } from '../../shared/search-bar/search-bar';
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
-            @for (asset of filteredAssets(); track asset.assetId) {
+            @for (asset of assets(); track asset.assetId) {
               <tr class="hover:bg-slate-50 transition-colors group">
                 <td class="py-4 px-6 font-mono text-sm text-slate-600">{{ asset.assetId }}</td>
                 <td class="py-4 px-6">
@@ -91,13 +91,37 @@ import { SearchBarComponent } from '../../shared/search-bar/search-bar';
                 </td>
               </tr>
             }
-            @if (filteredAssets().length === 0) {
+            @if (assets().length === 0) {
               <tr>
                 <td colspan="7" class="py-8 text-center text-slate-500">Không tìm thấy vật tư nào.</td>
               </tr>
             }
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="p-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3 bg-slate-50/30">
+        <div class="text-sm text-slate-500">
+          Hiển thị <span class="font-medium text-slate-700">{{ assets().length }}</span> / <span class="font-medium text-slate-700">{{ totalCount() }}</span> vật tư (Trang {{ currentPage() }}/{{ totalPages() || 1 }})
+        </div>
+        <div class="flex gap-1 items-center">
+          <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1"
+            class="px-3 py-1.5 rounded-lg text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed">
+            Trước
+          </button>
+          @for (p of pagesArray(); track p) {
+            <button (click)="goToPage(p)"
+              class="w-8 h-8 rounded-lg text-sm font-medium transition-all"
+              [class]="p === currentPage() ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'">
+              {{ p }}
+            </button>
+          }
+          <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages() || totalPages() === 0"
+            class="px-3 py-1.5 rounded-lg text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed">
+            Sau
+          </button>
+        </div>
       </div>
     </div>
 
@@ -220,21 +244,18 @@ export class AssetListComponent implements OnInit {
   assets = signal<Asset[]>([]);
   departments = signal<Department[]>([]);
   
+  totalCount = signal(0);
+  currentPage = signal(1);
+  totalPages = signal(0);
+  pageSize = 10;
+  isLoading = signal(false);
+
   searchTerm = signal('');
   filterDepartmentId = signal('all');
 
-  filteredAssets = computed(() => {
-    let list = this.assets();
-    const term = this.searchTerm().toLowerCase();
-
-    if (term) {
-      list = list.filter(a => 
-        a.assetName.toLowerCase().includes(term) || 
-        a.assetId.toLowerCase().includes(term) ||
-        a.category.toLowerCase().includes(term)
-      );
-    }
-    return list;
+  pagesArray = computed(() => {
+    const total = this.totalPages();
+    return Array.from({ length: total }, (_, i) => i + 1);
   });
 
   isAdminOrHR = computed(() => {
@@ -269,17 +290,40 @@ export class AssetListComponent implements OnInit {
   }
 
   loadData() {
-    this.assetService.getAll(this.filterDepartmentId()).subscribe(data => this.assets.set(data));
+    this.isLoading.set(true);
+    this.assetService.getAll({
+      page: this.currentPage(),
+      pageSize: this.pageSize,
+      search: this.searchTerm().trim() || undefined,
+      departmentId: this.filterDepartmentId()
+    }).subscribe({
+      next: (res) => {
+        this.assets.set(res.items);
+        this.totalCount.set(res.totalCount);
+        this.totalPages.set(res.totalPages);
+        this.isLoading.set(false);
+      },
+      error: () => this.isLoading.set(false)
+    });
+  }
+
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages() || page === this.currentPage()) return;
+    this.currentPage.set(page);
+    this.loadData();
   }
 
   onSearch(term: string) {
     this.searchTerm.set(term);
+    this.currentPage.set(1);
+    this.loadData();
   }
 
   onFilterDepartment(event: Event) {
     const select = event.target as HTMLSelectElement;
     this.filterDepartmentId.set(select.value);
-    this.loadData(); // Reload API based on department
+    this.currentPage.set(1);
+    this.loadData();
   }
 
   openCreateModal() {

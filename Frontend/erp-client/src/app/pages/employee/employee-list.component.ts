@@ -112,19 +112,28 @@ import { AuthService } from '../../services/auth.service';
         </div>
 
         <!-- Pagination -->
-        @if (totalPages() > 1) {
-          <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
-            <div class="text-sm text-slate-500">
-              Trang <span class="font-medium">{{ pageNumber() }}</span> / <span class="font-medium">{{ totalPages() }}</span>
-            </div>
-            <div class="flex gap-2">
-              <button (click)="changePage(pageNumber() - 1)" [disabled]="pageNumber() === 1"
-                class="px-3 py-1 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 disabled:opacity-50">Trước</button>
-              <button (click)="changePage(pageNumber() + 1)" [disabled]="pageNumber() === totalPages()"
-                class="px-3 py-1 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 disabled:opacity-50">Tiếp</button>
-            </div>
+        <div class="p-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3 bg-slate-50/30">
+          <div class="text-sm text-slate-500">
+            Hiển thị <span class="font-medium text-slate-700">{{ employees().length }}</span> / <span class="font-medium text-slate-700">{{ totalCount() }}</span> nhân viên (Trang {{ pageNumber() }}/{{ totalPages() || 1 }})
           </div>
-        }
+          <div class="flex gap-1 items-center">
+            <button (click)="changePage(pageNumber() - 1)" [disabled]="pageNumber() === 1"
+              class="px-3 py-1.5 rounded-lg text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed">
+              Trước
+            </button>
+            @for (p of pagesArray(); track p) {
+              <button (click)="changePage(p)"
+                class="w-8 h-8 rounded-lg text-sm font-medium transition-all"
+                [class]="p === pageNumber() ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'">
+                {{ p }}
+              </button>
+            }
+            <button (click)="changePage(pageNumber() + 1)" [disabled]="pageNumber() === totalPages() || totalPages() === 0"
+              class="px-3 py-1.5 rounded-lg text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed">
+              Sau
+            </button>
+          </div>
+        </div>
       }
     </div>
 
@@ -212,8 +221,14 @@ export class EmployeeListComponent implements OnInit {
   uniqueDepartments = this.employeeState.uniqueDepartments;
   pageNumber = this.employeeState.pageNumber;
   totalPages = this.employeeState.totalPages;
+  totalCount = this.employeeState.totalCount;
   searchTerm = this.employeeState.searchTerm;
   departmentId = this.employeeState.departmentId;
+
+  pagesArray = computed(() => {
+    const total = this.totalPages();
+    return Array.from({ length: total }, (_, i) => i + 1);
+  });
 
   departments = signal<Department[]>([]);
   positions = signal<Position[]>([]);

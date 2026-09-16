@@ -20,7 +20,12 @@ public class AssetController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<AssetDTO>>> GetAssets([FromQuery] string? departmentId = null)
+    public async Task<ActionResult<PagedResultDTO<AssetDTO>>> GetAssets(
+        [FromQuery] string? departmentId = null,
+        [FromQuery] string? search = null,
+        [FromQuery] string? status = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
         var query = _context.Assets.Include(a => a.Department).AsQueryable();
 
@@ -29,9 +34,26 @@ public class AssetController : ControllerBase
             query = query.Where(a => a.DepartmentId == departmentId);
         }
 
+        if (!string.IsNullOrEmpty(status) && status != "all")
+        {
+            query = query.Where(a => a.Status == status);
+        }
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            var term = search.Trim().ToLower();
+            query = query.Where(a => a.AssetName.ToLower().Contains(term)
+                                  || a.AssetId.ToLower().Contains(term)
+                                  || a.Category.ToLower().Contains(term));
+        }
+
+        var totalCount = await query.CountAsync();
+
         var assets = await query
             .OrderByDescending(a => a.AssetId.Length)
             .ThenByDescending(a => a.AssetId)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(a => new AssetDTO
             {
                 AssetId = a.AssetId,
@@ -48,7 +70,13 @@ public class AssetController : ControllerBase
             })
             .ToListAsync();
             
-        return Ok(assets);
+        return Ok(new PagedResultDTO<AssetDTO>
+        {
+            Items = assets,
+            TotalCount = totalCount,
+            PageNumber = page,
+            PageSize = pageSize
+        });
     }
 
     [HttpGet("{id}")]
