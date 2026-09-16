@@ -6,7 +6,7 @@
 
 ---
 
-## 🔑 TÀI KHOẢN TRẢI NGHIỆM HỆ THỐNG (DEMO CREDENTIALS)
+## TÀI KHOẢN TRẢI NGHIỆM HỆ THỐNG (DEMO CREDENTIALS)
 
 Hệ thống đã được nạp sẵn dữ liệu mẫu (Seeded Data). Quý Thầy Cô và Mentor có thể đăng nhập bằng 2 tài khoản phân quyền:
 
@@ -17,7 +17,7 @@ Hệ thống đã được nạp sẵn dữ liệu mẫu (Seeded Data). Quý Th�
 
 ---
 
-## 🛠️ NGĂN XẾP CÔNG NGHỆ (TECH STACK)
+## NGĂN XẾP CÔNG NGHỆ (TECH STACK)
 
 | Thành phần | Công nghệ / Thư viện | Vai trò kỹ thuật trong hệ thống |
 | :--- | :--- | :--- |
@@ -32,35 +32,35 @@ Hệ thống đã được nạp sẵn dữ liệu mẫu (Seeded Data). Quý Th�
 
 ---
 
-## 🌟 CÁC TÍNH NĂNG VÀ ĐIỂM SÁNG KỸ THUẬT NỔI BẬT
+## CÁC TÍNH NĂNG 
 
-### 1. 📊 Bảng điều khiển (HR Dashboard)
+### 1. Bảng điều khiển (HR Dashboard)
 - Các thẻ KPI (Tổng nhân viên, Đang làm việc, Đang nghỉ phép, Tổng phòng ban, Tổng tài sản) tự động nhảy số thời gian thực bằng `computed()` Signals.
 - Tích hợp Widget Chấm công 1-chạm trực tiếp trên Dashboard kèm đồng hồ thời gian thực và lời chào buổi sáng/chiều.
 
-### 2. 👥 Quản lý Nhân sự (Employee Management)
+### 2. Quản lý Nhân sự (Employee Management)
 - **Thuật toán Tự sinh Mã nhân viên**: Format `NV_{STT}_{ChữCáiĐầu}` (Ví dụ: "Nguyễn Tiến Thắng" $\rightarrow$ `NV_15_NTT`).
 - **Chống trùng lặp mã (Collision Prevention)**: Vòng lặp `while (AnyAsync)` trong DB đảm bảo mã duy nhất 100%.
 - **Tự động cấp tài khoản**: Sinh `Username`, `Email` công ty và mật khẩu mặc định băm bằng `BCrypt`.
 - **Xóa mềm (Soft Delete)**: Cập nhật cờ `IsDeleted = true` để giữ trọn vẹn lịch sử chấm công, phân bổ tài sản.
 - **Phân trang số 1-2-3**: Phân trang chuẩn Database (`Skip/Take`) với các nút chuyển trang trực quan.
 
-### 3. 🏢 Quản lý Phòng ban & Ràng buộc toàn vẹn dữ liệu
+### 3. Quản lý Phòng ban & Ràng buộc toàn vẹn dữ liệu
 - CRUD đầy đủ thông tin phòng ban.
 - **Ràng buộc an toàn dữ liệu**: Kiểm tra bằng `AnyAsync` — Chặn không cho xóa phòng ban nếu đang còn nhân viên hoặc tài sản trực thuộc.
 
-### 4. 📦 Quản lý Vật tư & Thiết bị (Asset Management)
+### 4. Quản lý Vật tư & Thiết bị (Asset Management)
 - Theo dõi vòng đời tài sản (Đang sử dụng, Sẵn sàng cấp phát, Đang bảo trì, Hỏng).
 - Lọc theo phòng ban và tìm kiếm theo tên/mã ở phía Server.
 - **Phân trang máy chủ số 1-2-3**: Trả về `PagedResultDTO<AssetDTO>`, tối ưu RAM máy chủ.
 
-### 5. ⏰ Quản lý Chấm công thông minh (Attendance)
+### 5. Quản lý Chấm công thông minh (Attendance)
 - **Quy tắc mốc 8:15 AM**: Check-in sau 08:15:00 tự động gắn trạng thái `Late` (Đi muộn), trước 08:15:00 là `OnTime` (Đúng giờ).
 - **Triệt tiêu chấm công hộ**: Backend tự động trích xuất `EmployeeId` từ JWT Token của người đăng nhập, không nhận ID từ client gửi lên.
 - **Chống chấm công đè**: Chặn check-in 2 lần trong cùng một ngày.
 - **4 Bộ lọc kết hợp (`IQueryable`)**: Cho phép Admin lọc đồng thời Phòng ban + Trạng thái + Ngày + Tên nhân viên.
 
-### 6. 📝 Quy trình Phê duyệt Nghỉ phép (Leave Request)
+### 6. Quy trình Phê duyệt Nghỉ phép (Leave Request)
 - Quy trình phê duyệt 2 chiều giữa Nhân viên và Quản trị viên (`Pending` $\rightarrow$ `Approved` / `Rejected`).
 - **Cơ chế Bảo vệ 2 lớp chống xóa bậy (Two-Layer Security)**:
   - *Lớp 1 (UI)*: Ẩn nút Hủy khi đơn đã được duyệt bằng `@if (req.status === 'Pending')`.
@@ -68,7 +68,7 @@ Hệ thống đã được nạp sẵn dữ liệu mẫu (Seeded Data). Quý Th�
 
 ---
 
-## 🚀 HƯỚNG DẪN CÀI ĐẶT & CHẠY LOCALHOST
+## HƯỚNG DẪN CÀI ĐẶT & CHẠY LOCALHOST
 
 ### 1. Yêu cầu môi trường
 * [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
