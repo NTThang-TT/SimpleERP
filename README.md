@@ -1,6 +1,5 @@
-# 🏢 SimpleERP — Hệ Thống Quản Trị Doanh Nghiệp Nội Bộ (Mini ERP)
+#  SimpleERP — Hệ Thống Quản Trị Doanh Nghiệp Nội Bộ (Mini ERP)
 
-> **Báo cáo Tốt nghiệp / Đồ án Thực tập 14 Tuần**  
 > **Sinh viên thực hiện**: Nguyễn Tiến Thắng  
 > **Nền tảng**: Angular 19 (Frontend SPA) + ASP.NET Core 8 (Backend RESTful API) + Microsoft SQL Server
 
